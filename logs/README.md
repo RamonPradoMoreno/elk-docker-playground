@@ -1,0 +1,1 @@
+This folder needs to be here and empty so persistence works out of the box.

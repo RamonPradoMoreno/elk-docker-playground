@@ -1,0 +1,64 @@
+version: '3.7'
+services: 
+    elasticsearch:
+        image: elasticsearch:7.6.1
+        container_name: elasticsearch
+        #ports: 
+            # Logstash sends data here because of logstash/pipelines/gelf.com
+            #- 9200:9200
+            # Unknown
+            #- 9300:9300
+        networks: 
+            - elk_net
+        volumes:
+            # Volume for logs persistence
+            - type: bind
+              source: ./logs
+              target: /usr/share/elasticsearch/data
+        environment: 
+            - discovery.type=single-node
+    logstash:
+        image: docker.elastic.co/logstash/logstash:7.6.1
+        container_name: logstash
+        #ports:
+            # Unknown
+            #- 5000:5000
+            # Gets basic data about logstash node
+            #- 9600:9600
+            # Apps send logs here, not needed 
+            # if logs are coming from a container
+            #- 12201:12201/udp
+        networks: 
+            - elk_net
+        volumes: 
+            - ./conf/logstash:/usr/share/logstash/pipeline
+            #- ./logs:/use/share/elasticsearch/data
+        depends_on: 
+            -  elasticsearch
+    kibana:
+        image: docker.elastic.co/kibana/kibana:7.6.1
+        container_name: kibana
+        ports: 
+            # Kibana interface
+            - 5601:5601
+        networks: 
+            - elk_net
+        volumes: 
+            - ./conf/kibana:/usr/share/kibana/config/
+        depends_on: 
+            - logstash
+    log-to-elk:
+        # This is a simple microservice that sends
+        # data to logstash when it receives a GET request.
+        image: rpardom/log-to-elk-microservice
+        container_name: log-to-elk
+        ports: 
+            # To receive the curls for logs generation
+            - 8080:8080
+        networks: 
+            - elk_net
+
+networks: 
+    elk_net:
+        driver: bridge
+
