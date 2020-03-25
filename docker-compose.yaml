@@ -30,8 +30,11 @@ services:
             #- 12201:12201/udp
         networks: 
             - elk_net
-        volumes: 
-            - ./conf/logstash:/usr/share/logstash/pipeline
+        volumes:
+            # Volume for logstash configuration
+            - type: bind
+              source: ./conf/logstash/gelf.conf
+              target: /usr/share/logstash/pipeline/gelf.conf
             #- ./logs:/use/share/elasticsearch/data
         depends_on: 
             -  elasticsearch
@@ -44,7 +47,10 @@ services:
         networks: 
             - elk_net
         volumes: 
-            - ./conf/kibana:/usr/share/kibana/config/
+            # Volume for kibana configuration
+            - type: bind
+              source: ./conf/kibana/kibana.yml
+              target: /usr/share/kibana/config/kibana.yml
         depends_on: 
             - logstash
     log-to-elk:

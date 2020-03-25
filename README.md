@@ -1,4 +1,4 @@
-# Elk ecosystem construction
+# Elk stack playground
 
 *Source*: This project was started by **jtoledano** you can find his work at [github](https://github.com/JulianToledano/monitoring-quarkus-apps). At some point I started to focus more on docker and since our work diverged I decided to post it here. We are still collaborating though. :happy:
 
