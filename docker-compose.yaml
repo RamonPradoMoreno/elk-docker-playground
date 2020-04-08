@@ -18,16 +18,17 @@ services:
         environment: 
             - discovery.type=single-node
     logstash:
-        image: docker.elastic.co/logstash/logstash:7.6.1
+        build: .
         container_name: logstash
-        #ports:
+        ports:
             # Unknown
             #- 5000:5000
             # Gets basic data about logstash node
             #- 9600:9600
             # Apps send logs here, not needed 
             # if logs are coming from a container
-            #- 12201:12201/udp
+            - 12201:12201/udp
+            - 9000:9000
         networks: 
             - elk_net
         volumes:
