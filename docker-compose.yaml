@@ -12,13 +12,15 @@ services:
             - elk_net
         volumes:
             # Volume for logs persistence
+            # If you dont want data in to be stored to avoid trash:
+            # change "type" to tmpfs and comment the "source" line.
             - type: bind
               source: ./logs
               target: /usr/share/elasticsearch/data
         environment: 
             - discovery.type=single-node
     logstash:
-        image: docker.elastic.co/logstash/logstash:7.6.1
+        image: logstash:7.6.1
         container_name: logstash
         #ports:
             # Unknown
@@ -39,7 +41,7 @@ services:
         depends_on: 
             -  elasticsearch
     kibana:
-        image: docker.elastic.co/kibana/kibana:7.6.1
+        image: kibana:7.6.1
         container_name: kibana
         ports: 
             # Kibana interface
@@ -56,13 +58,18 @@ services:
     log-to-elk:
         # This is a simple microservice that sends
         # data to logstash when it receives a GET request.
-        image: rpardom/log-to-elk-microservice
+        image: rpardom/log-to-elk-microservice:native
         container_name: log-to-elk
         ports: 
             # To receive the curls for logs generation
             - 8080:8080
         networks: 
             - elk_net
+        volumes: 
+            # Volume for quarkus microservice configuration
+            - type: bind
+              source: ./conf/log-to-elk/application.properties
+              target: /work/config/application.properties
 
 networks: 
     elk_net:
